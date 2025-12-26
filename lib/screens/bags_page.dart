@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/provider/globalProvider.dart';
+import '../l10n/strings.dart';
 
 class BagsPage extends StatelessWidget {
 
-  BagsPage({super.key});
+  const BagsPage({super.key});
  
    @override
   Widget build(BuildContext context) {
@@ -12,13 +13,13 @@ class BagsPage extends StatelessWidget {
       return Consumer<Global_provider>(
       builder: (context, provider, child) {
         if (provider.cartItems.isEmpty) {
-          return const Scaffold(
-            body: Center(child: Text('Cart is empty')),
+          return Scaffold(
+            body: Center(child: Text(AppStrings.t(context, 'cart_empty'))),
           );
         }
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Cart'),
+            title: Text(AppStrings.t(context, 'cart_title')),
           ),
           body: ListView.builder(
             itemCount: provider.cartItems.length,
@@ -69,7 +70,7 @@ class BagsPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'Total: \$${provider.cartTotal.toStringAsFixed(2)}',
+                  '${AppStrings.t(context, 'total')}: \$${provider.cartTotal.toStringAsFixed(2)}',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -77,7 +78,7 @@ class BagsPage extends StatelessWidget {
                 ),
                 ElevatedButton(
                   onPressed: () {},
-                  child: const Text('Buy All'),
+                  child: Text(AppStrings.t(context, 'buy_all')),
                 ),
               ],
             ),

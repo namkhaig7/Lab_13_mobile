@@ -31,9 +31,37 @@ class ProductModel {
   static List<ProductModel> fromList(List<dynamic> data) =>
       data.map((e) => ProductModel.fromJson(e as Map<String, dynamic>)).toList();
 
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError();
+  ProductModel copyWith({
+    bool? isFavorite,
+    int? count,
+  }) {
+    return ProductModel(
+      isFavorite: isFavorite ?? this.isFavorite,
+      id: id,
+      title: title,
+      price: price,
+      description: description,
+      category: category,
+      image: image,
+      rating: rating,
+      count: count ?? this.count,
+    );
   }
+
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'title': title,
+        'price': price,
+        'description': description,
+        'category': category,
+        'image': image,
+        'rating': {
+          'rate': rating?.rate,
+          'count': rating?.count,
+        },
+        'count': count,
+        'isFavorite': isFavorite,
+      };
 }
 
 @JsonSerializable(createToJson: false)

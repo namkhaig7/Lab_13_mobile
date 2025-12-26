@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/provider/globalProvider.dart';
 import 'package:shop_app/models/users.dart';
+import '../l10n/strings.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -14,6 +15,7 @@ class _ProfilePageState extends State<ProfilePage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   late Future<List<AppUser>> _userFuture;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -28,18 +30,65 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   }
 
-  void _login(Global_provider provider) {
-    final success = provider.login(
+  Future<void> _login(Global_provider provider) async {
+    setState(() {
+      _isLoading = true;
+    });
+    final success = await provider.login(
       _usernameController.text.trim(),
       _passwordController.text.trim(),
     );
+    setState(() {
+      _isLoading = false;
+    });
     if (!success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Нэвтрэх нэр эсвэл нууц үг буруу')),
+        SnackBar(
+          content: Text(
+            provider.lastLoginError ?? AppStrings.t(context, 'login_error'),
+          ),
+        ),
       );
       return;
     }
     FocusScope.of(context).unfocus();
+  }
+
+  Widget _languageSelector(Global_provider provider) {
+    const languageLabels = {'en': 'English', 'mn': 'Монгол'};
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 12),
+        Text(
+          AppStrings.t(context, 'language'),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
+        const SizedBox(height: 6),
+        InputDecorator(
+          decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<Locale>(
+              value: provider.locale,
+              isExpanded: true,
+              items: provider.supportedLocales
+                  .map(
+                    (locale) => DropdownMenuItem(
+                      value: locale,
+                      child: Text(languageLabels[locale.languageCode] ?? locale.languageCode),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                if (value != null) provider.setLocale(value);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -59,19 +108,34 @@ class _ProfilePageState extends State<ProfilePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Нэвтэрсэн хэрэглэгч',
-                      style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    Text(
+                      AppStrings.t(context, 'login'),
+                      style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     Text('${user.firstName} ${user.lastName}', style: const TextStyle(fontSize: 18)),
                     Text(user.email),
                     Text(user.phone),
+                    if (provider.token != null) ...[
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Token:',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+                      //task2
+                      SelectableText(
+                        provider.token == 'offline'
+                            ? 'Offline session (no server token)'
+                            : provider.token!,
+                        style: const TextStyle(fontSize: 12, color: Colors.black87),
+                      ),
+                    ],
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: provider.logout,
-                      child: const Text('Гарах'),
+                      child: Text(AppStrings.t(context, 'logout')),
                     ),
+                    _languageSelector(provider),
                   ],
                 ),
               );
@@ -82,33 +146,44 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Нэвтрэх',
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  Text(
+                    AppStrings.t(context, 'login'),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    AppStrings.t(context, 'login_hint'),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _usernameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Username',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: AppStrings.t(context, 'username'),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: _passwordController,
                     obscureText: true,
-                    decoration: const InputDecoration(
-                      labelText: 'Password',
-                      border: OutlineInputBorder(),
+                    decoration: InputDecoration(
+                      labelText: AppStrings.t(context, 'password'),
+                      border: const OutlineInputBorder(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () => _login(provider),
-                      child: const Text('Нэвтрэх'),
+                      onPressed: _isLoading ? null : () => _login(provider),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 18,
+                              width: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : Text(AppStrings.t(context, 'login_button')),
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -116,6 +191,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     'Жишээ: username: johnd  | password: m38rmF\$',
                     style: TextStyle(fontSize: 12, color: Colors.grey),
                   ),
+                  const SizedBox(height: 8),
+                  _languageSelector(provider),
                 ],
               ),
             );

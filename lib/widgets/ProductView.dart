@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shop_app/screens/product_detail.dart';
 import '../models/product_model.dart';
 import '../provider/globalProvider.dart';
+import '../l10n/strings.dart';
 
 class ProductViewShop extends StatelessWidget {
   final ProductModel data;
@@ -24,12 +25,12 @@ class ProductViewShop extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Нэвтрэх шаардлагатай'),
-        content: const Text('Энэ үйлдлийг хийхийн тулд эхлээд нэвтэрнэ үү.'),
+        title: Text(AppStrings.t(context, 'login')),
+        content: Text(AppStrings.t(context, 'require_login')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Болих'),
+            child: const Text('OK'),
           ),
           TextButton(
             onPressed: () {

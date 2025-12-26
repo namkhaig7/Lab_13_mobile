@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shop_app/models/product_model.dart';
 import 'package:shop_app/provider/globalProvider.dart';
 import '../widgets/ProductView.dart';
+import '../l10n/strings.dart';
 
 class ShopPage extends StatefulWidget {
   const ShopPage({super.key});
@@ -35,12 +36,12 @@ class _ShopPageState extends State<ShopPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: CustomScrollView(
                   slivers: [
-                    const SliverToBoxAdapter(
+                    SliverToBoxAdapter(
                       child: Padding(
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         child: Text(
-                          "Бараанууд",
-                          style: TextStyle(
+                          AppStrings.t(context, 'products_title'),
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: Color.fromARGB(223, 37, 37, 37),

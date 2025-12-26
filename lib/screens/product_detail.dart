@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/models/product_model.dart';
 import 'package:shop_app/provider/globalProvider.dart';
+import '../l10n/strings.dart';
 
 class Product_detail extends StatelessWidget {
   final ProductModel product; 
@@ -14,7 +15,7 @@ class Product_detail extends StatelessWidget {
       return;
     }
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Эхлээд профайл дээр нэвтрэнэ үү.')),
+      SnackBar(content: Text(AppStrings.t(context, 'require_login'))),
     );
     provider.changeCurrentIdx(3);
   }
